@@ -6,7 +6,7 @@ let modInfo = {
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (0.1), // Used for hard resets and new players
+	initialStartPoints: new Decimal (0), // Used for hard resets and new players
 	offlineLimit: 0,  // In hours
 }
 
@@ -18,7 +18,7 @@ let VERSION = {
 
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.0 - Pre-Alpha</h3><br>
-		- Added... Wat?`
+		- Initial Pre-Alpha Release`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
@@ -40,7 +40,9 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
-	let gain = new Decimal(0)
+	let gain = new Decimal(0.5)
+	if (hasUpgrade('l', 11)) gain = gain.times(2)
+	if (hasUpgrade('l', 12)) gain = gain.times(upgradeEffect('l', 12))
 	return gain
 }
 
@@ -54,7 +56,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("1e1000"))
+	return player.points.gte(new Decimal("1e10"))
 }
 
 

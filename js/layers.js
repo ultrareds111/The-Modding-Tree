@@ -7,14 +7,15 @@ addLayer("l", {
 		points: new Decimal(0),
     }},
     color: "rgba(75, 220, 75, 1)",
-    requires: new Decimal(0.1), // Can be a function that takes requirement increases into account
+    requires: new Decimal(1), // Can be a function that takes requirement increases into account
     resource: "levels", // Name of prestige currency
     baseResource: "cash", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
     type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.5, // Prestige currency exponent
     gainMult() { // Calculate the multiplier for main currency from bonuses
-        mult = new Decimal(1)
+        let mult = new Decimal(1)
+        if (hasUpgrade('l', 13)) mult = mult.times(upgradeEffect('l', 13))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -24,5 +25,30 @@ addLayer("l", {
     hotkeys: [
         {key: "l", description: "L: Reset for levels", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
-    layerShown(){return true}
+    layerShown(){return true},
+    upgrades: {
+        11: {
+            title: "Level Up!",
+            description: "Double your cash gain.",
+            cost: new Decimal(1),
+        },
+        12: {
+            title: "Experience Boost",
+            description: "Increase cash gain based on your levels.",
+            cost: new Decimal(2),
+            effect() {
+                return player[this.layer].points.add(1).pow(0.5)
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }, // Add formatting to the effect
+        },
+        13: {
+            title: "Wealth Training",
+            description: "Increase level gain based on your cash.",
+            cost: new Decimal(5),
+            effect() {
+                return player.points.add(1).pow(0.15)
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }, // Add formatting to the effect
+        },
+    },
 })
